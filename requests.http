@@ -1,0 +1,61 @@
+### Extensão "REST Client" (VS Code) ou copie para Postman/Insomnia/Thunder Client
+@host = http://localhost:3000
+@token = COLE_O_TOKEN_AQUI
+### 1. Cadastro
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{ "username": "maria", "email": "maria@email.com", "password": "123456" }
+
+### 2. Login (copie o token retornado)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "email": "maria@email.com", "password": "123456" }
+
+### 3. Sem token -> 401
+GET {{host}}/livros
+
+### 4. Com token -> 200
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+### 5. Criar categoria
+POST {{host}}/categorias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nome": "Romance" }
+
+### 6. Criar livro (use o id da categoria)
+POST {{host}}/livros
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "titulo": "Dom Casmurro", "anoPublicacao": 1899, "exemplares": 3, "categoriaId": "cmwsojxva0007p9vdtkbno9pu" }
+
+### 7. Criar autor
+POST {{host}}/autores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nome": "Machado de Assis", "nacionalidade": "Brasileira" }
+
+### 8. N:N - associar autor ao livro
+POST {{host}}/livros/cmwsol96w0009p9vd5qk3r2fr/autores/cmwsogsfh0005p9vdpa4et9oj
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "papel": "Autor principal" }
+
+### 9. N:N - autores de um livro
+GET {{host}}/livros/cmwsol96w0009p9vd5qk3r2fr/autores
+Authorization: Bearer {{token}}
+
+### 10. N:N - livros de um autor
+GET {{host}}/autores/cmwsogsfh0005p9vdpa4et9oj/livros
+Authorization: Bearer {{token}}
+
+### 11. N:N - remover associação
+DELETE {{host}}/livros/cmwsol96w0009p9vd5qk3r2fr/autores/cmwsogsfh0005p9vdpa4et9oj
+Authorization: Bearer {{token}}

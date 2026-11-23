@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Usuários do sistema (bibliotecários) - 1:N com todas as entidades
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  username   String      @unique
+  password   String
+  livros     Livro[]
+  autores    Autor[]
+  categorias Categoria[]
+
+  @@map("users")
+}
+
+// Entidade de apoio (C): 1:N com Livro
+model Categoria {
+  id     String  @id @default(cuid())
+  nome   String
+  userId String
+  user   User    @relation(fields: [userId], references: [id])
+  livros Livro[]
+
+  @@map("categorias")
+}
+
+// Entidade A: N:N com Autor
+model Livro {
+  id            String       @id @default(cuid())
+  titulo        String
+  anoPublicacao Int
+  exemplares    Int          @default(1)
+  userId        String
+  categoriaId   String
+  user          User         @relation(fields: [userId], references: [id])
+  categoria     Categoria    @relation(fields: [categoriaId], references: [id])
+  autores       LivroAutor[]
+
+  @@map("livros")
+}
+
+// Entidade B: N:N com Livro
+model Autor {
+  id            String       @id @default(cuid())
+  nome          String
+  nacionalidade String?
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  livros        LivroAutor[]
+
+  @@map("autores")
+}
+
+// Tabela associativa (N:N) com campos extras
+model LivroAutor {
+  livroId  String
+  autorId  String
+  papel    String   @default("Autor principal")
+  criadoEm DateTime @default(now())
+  livro    Livro    @relation(fields: [livroId], references: [id], onDelete: Cascade)
+  autor    Autor    @relation(fields: [autorId], references: [id], onDelete: Cascade)
+
+  @@id([livroId, autorId])
+  @@map("livros_autores")
+}
